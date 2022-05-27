@@ -31,15 +31,14 @@ inputs:
     required: false
     default: '5432'
   db_name:
-    description: database schema
-    required: false
-    default: 'public'
-  path_to_migrations_folder:
+    description: database name
+    required: true
+  migrations_folder_path:
     description: Path from repository root to the database migrations folder
     required: false
     default: 'db/migrations'
-  path_to_flyway_config:
-    description: Path from migrations foldert to the flyway config file
+  flyway_config_path:
+    description: Path from repository root folder to the flyway config file
     required: false
     default: 'db/conf/flyway.conf'
 runs:
@@ -67,8 +66,8 @@ runs:
         db_password: ${{ inputs.db_password }}
         db_port: ${{ inputs.db_port }}
         db_name: ${{ inputs.db_name }}
-        path_to_migrations_folder: ${{ inputs.path_to_migrations_folder }}
-        path_to_flyway_config: ${{ inputs.path_to_flyway_config }}
+        migrations_folder_path: ${{ inputs.migrations_folder_path }}
+        flyway_config_path: ${{ inputs.flyway_config_path }}
 
     - name: Message success
       if: ${{ steps.check.outputs.triggered == 'true' && success() }}
