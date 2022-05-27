@@ -1,0 +1,99 @@
+name: Staging Migrate Database to ECS on PR Comment
+description: "Works only for PR comments"
+inputs:
+  github_token:
+    description: Github token to write comments on PR. Commonly secrets.GITHUB_TOKEN
+    required: true
+  match_comment_to_deploy:
+    description: String that will look for in the PR
+    required: false
+    default: 'migrate db'
+  ssh_key:
+    description: ssh key
+    required: true
+  ssh_host:
+    description: ssh host
+    required: true
+  ssh_user:
+    description: ssh username
+    required: true
+  db_host:
+    description: database host
+    required: true
+  db_user:
+    description: database user
+    required: true
+  db_password:
+    description: database password
+    required: true
+  db_port:
+    description: database port
+    required: false
+    default: '5432'
+  db_name:
+    description: database schema
+    required: false
+    default: 'public'
+  path_to_migrations_folder:
+    description: Path from repository root to the database migrations folder
+    required: false
+    default: 'db/migrations'
+  path_to_flyway_config:
+    description: Path from migrations foldert to the flyway config file
+    required: false
+    default: 'db/conf/flyway.conf'
+runs:
+  using: "composite"
+  steps:
+    - name: Check if @meetlara/deploy is on the message
+      uses: khan/pull-request-comment-trigger@master
+      id: check
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      with:
+        trigger: ${{ inputs.match_comment_to_deploy }}
+        prefix_only: true
+        reaction: 'rocket'
+
+    - name: Migrate Database
+      if: steps.check.outputs.triggered == 'true'
+      uses: meetlara/flyway-migrations@main
+      with:
+        ssh_key: ${{ inputs.ssh_key }}
+        ssh_host: ${{ inputs.ssh_host }}
+        ssh_user: ${{ inputs.ssh_user }}
+        db_host: ${{ inputs.db_host }}
+        db_user: ${{ inputs.db_user }}
+        db_password: ${{ inputs.db_password }}
+        db_port: ${{ inputs.db_port }}
+        db_name: ${{ inputs.db_name }}
+        path_to_migrations_folder: ${{ inputs.path_to_migrations_folder }}
+        path_to_flyway_config: ${{ inputs.path_to_flyway_config }}
+
+    - name: Message success
+      if: ${{ steps.check.outputs.triggered == 'true' && success() }}
+      uses: actions/github-script@v4
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      with:
+        script: |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Database migration succeeded! 🚀\n\nYou can check the migration logs [here](https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId + ')',
+          });
+      
+    - name: Message failure
+      if: ${{ steps.check.outputs.triggered == 'true' && failure() }}
+      uses: actions/github-script@v4
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      with:
+        script: |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Database migration failed! ❌\n\nYou can check errors on deploy logs [here](https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId + ')',
+          });
