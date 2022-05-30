@@ -54,6 +54,18 @@ runs:
         prefix_only: true
         reaction: 'rocket'
 
+    - name: Checkout
+      if: steps.check.outputs.triggered == 'true'
+      uses: actions/checkout@v2
+
+    - name: Checkout Pull Request
+      shell: bash
+      id: commit
+      if: steps.check.outputs.triggered == 'true'
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: hub pr checkout ${{ github.event.issue.number }}
+
     - name: Migrate Database
       if: steps.check.outputs.triggered == 'true'
       uses: meetlara/flyway-migrations@main
