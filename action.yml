@@ -80,6 +80,7 @@ runs:
         db_name: ${{ inputs.db_name }}
         migrations_folder_path: ${{ inputs.migrations_folder_path }}
         flyway_config_path: ${{ inputs.flyway_config_path }}
+        flyway_extra_params: -outOfOrder="true"
 
     - name: Message success
       if: ${{ steps.check.outputs.triggered == 'true' && success() }}
