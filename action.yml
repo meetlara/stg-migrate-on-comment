@@ -41,6 +41,10 @@ inputs:
     description: Path from repository root folder to the flyway config file
     required: false
     default: 'db/conf/flyway.conf'
+  flyway_command:
+    description: Commmand to run. Ej: migrate | repair
+    required: falase
+    default: 'migrate'
 runs:
   using: "composite"
   steps:
@@ -81,6 +85,7 @@ runs:
         migrations_folder_path: ${{ inputs.migrations_folder_path }}
         flyway_config_path: ${{ inputs.flyway_config_path }}
         flyway_extra_params: -outOfOrder="true" -ignoreMigrationPatterns="*:missing"
+        flyway_command: ${{ inputs.flyway_command }}
 
     - name: Message success
       if: ${{ steps.check.outputs.triggered == 'true' && success() }}
