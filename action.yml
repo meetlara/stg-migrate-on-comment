@@ -42,7 +42,7 @@ inputs:
     required: false
     default: 'db/conf/flyway.conf'
   flyway_command:
-    description: Commmand to run. Ej: migrate | repair
+    description: Commmand to run. Ej: migrate, repair
     required: false
     default: 'migrate'
 runs:
