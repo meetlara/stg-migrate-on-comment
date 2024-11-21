@@ -69,6 +69,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
+        sudo apt-get update
         sudo apt install hub
         hub pr checkout ${{ github.event.issue.number }}
 
