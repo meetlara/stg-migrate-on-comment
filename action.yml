@@ -49,7 +49,7 @@ runs:
   using: "composite"
   steps:
     - name: Check if @meetlara/deploy is on the message
-      uses: khan/pull-request-comment-trigger@master
+      uses: meetlara/pull-request-comment-trigger@master
       id: check
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
