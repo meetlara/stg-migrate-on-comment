@@ -87,7 +87,7 @@ runs:
         db_name: ${{ inputs.db_name }}
         migrations_folder_path: ${{ inputs.migrations_folder_path }}
         flyway_config_path: ${{ inputs.flyway_config_path }}
-        flyway_extra_params: -outOfOrder="true" -ignoreMigrationPatterns="*:missing"
+        flyway_extra_params: -outOfOrder=true -ignoreMigrationPatterns=*:missing
         flyway_command: ${{ inputs.flyway_command }}
 
     - name: Message success
